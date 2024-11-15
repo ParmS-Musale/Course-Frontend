@@ -11,15 +11,8 @@ const Login = () => {
   const handleSubmit = (e) => {
     e.preventDefault();
     // Assuming login() is a function that handles authentication
-    login(email, password)
-      .then(() => {
-        // Redirect to the homepage upon successful login
-        navigate('/');
-      })
-      .catch((err) => {
-        console.error('Login failed:', err);
-        // Optionally, you can show an error message to the user here
-      });
+    login(email, password);
+      
   };
 
   return (

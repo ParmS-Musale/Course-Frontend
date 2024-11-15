@@ -7,9 +7,11 @@ const Signup = () => {
   const [password, setPassword] = useState('');
   const [username, setUsername] = useState('');  // Added state for username
 
-  const handleSubmit = (e) => {
+  const handleSubmit =async (e) => {
     e.preventDefault();
-    signup(username, email, password);  // Pass username, email, and password to signup function
+    console.log(email,password)
+    signup(email,password)
+  
   };
 
   return (
