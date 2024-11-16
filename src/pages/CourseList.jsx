@@ -77,10 +77,7 @@ import axios from "axios";
 //   },
 // ];
 
-
- 
-
-function CourseList() {
+ function CourseList() {
 
   const [courses,setcourses] = useState();
   const fetchCourese = async ()=>{

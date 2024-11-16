@@ -1,17 +1,23 @@
-import axios from 'axios';
-import React, { useEffect, useState } from 'react';
-import { useForm } from 'react-hook-form';
-import { useNavigate } from 'react-router-dom';
+import axios from "axios";
+import { Toast } from "bootstrap";
+import React, { useEffect, useState } from "react";
+import { useForm } from "react-hook-form";
+import { useNavigate } from "react-router-dom";
+import { toast } from "react-toastify";
 
 const AddCourseForm = () => {
-  const { register, handleSubmit, formState: { errors } } = useForm();
+  const {
+    register,
+    handleSubmit,
+    formState: { errors },
+  } = useForm();
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [formError, setFormError] = useState('');
-
+  const [formError, setFormError] = useState("");
+  const navigate= useNavigate();
   const onSubmit = async (data) => {
     setIsSubmitting(true);
-    setFormError('');
-
+    setFormError("");
+  
     // Prepare the data to send to the API
     const courseData = {
       title: data.title,
@@ -19,117 +25,150 @@ const AddCourseForm = () => {
       courseDescription: data.courseDescription,
       price: parseFloat(data.price), // Ensure price is a number
       imageUrl: data.imageUrl,
-      // createdAt: new Date().toISOString(),
-      // updatedAt: new Date().toISOString(),
     };
-
+  
     try {
-      const response = await axios.post('http://localhost:5020/admin/courses',courseData);
-      console.log(response)
-      if (!response.ok) {
-        throw new Error('Failed to add course');
+      const response = await axios.post(
+        "http://localhost:5020/admin/courses",
+        courseData
+      );
+      console.log(response);
+  
+      if (response.data.id) {
+        // Success - Trigger toast
+        toast.success("Course added successfully");
+        navigate("/all-course")
+        // Optionally reset the form or show success message
+      } else {
+        // Handle non-successful responses (status not 200)
+        throw new Error(response?.data.message);
       }
-
-      const result = await response.json();
-      console.log('Course added successfully:', result);
-      // Optionally reset the form or show success message
     } catch (error) {
-      setFormError(error.message);
-      console.error('Error adding course:', error);
+      setFormError(error.message || "Something went wrong");
+      console.error("Error adding course:", error);
     } finally {
       setIsSubmitting(false);
     }
   };
-
-
-  const navigate = useNavigate()
-  useEffect(()=>{
-
+  
+  
+  useEffect(() => {
     const token = localStorage.getItem("token");
-    if(!token){
-      navigate("/login")
+    if (!token) {
+      navigate("/login");
     }
-
-  },[])
+  }, []);
 
   return (
-    <div className="max-w-4xl mx-auto p-6 bg-white shadow-md rounded-lg mt-8">
-      <h2 className="text-2xl font-semibold mb-6">Add New Course</h2>
+    <div className="max-w-4xl mx-auto p-8 bg-white shadow-xl rounded-lg mt-10">
+      <h2 className="text-3xl font-semibold text-gray-800 mb-8 text-center">
+        Add New Course
+      </h2>
 
       {formError && (
-        <div className="text-red-500 mb-4">
+        <div className="text-red-600 mb-6 text-center">
           <p>{formError}</p>
         </div>
       )}
 
-      <form onSubmit={handleSubmit(onSubmit)}>
+      <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
         {/* Title */}
-        <div className="mb-4">
-          <label className="block text-sm font-medium text-gray-700">Course Title</label>
+        <div className="mb-6">
+          <label className="block text-lg font-medium text-gray-700 mb-2">
+            Course Title
+          </label>
           <input
             type="text"
-            {...register('title', { required: 'Course title is required' })}
-            className="mt-1 block w-full px-4 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+            {...register("title", { required: "Course title is required" })}
+            className="w-full px-4 py-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-gray-500"
             placeholder="Enter course title"
           />
-          {errors.title && <p className="text-red-500 text-sm">{errors.title.message}</p>}
+          {errors.title && (
+            <p className="text-red-500 text-sm mt-1">{errors.title.message}</p>
+          )}
         </div>
 
         {/* Description */}
-        <div className="mb-4">
-          <label className="block text-sm font-medium text-gray-700">Description</label>
+        <div className="mb-6">
+          <label className="block text-lg font-medium text-gray-700 mb-2">
+            Description
+          </label>
           <input
             type="text"
-            {...register('description', { required: 'Description is required' })}
-            className="mt-1 block w-full px-4 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+            {...register("description", {
+              required: "Description is required",
+            })}
+            className="w-full px-4 py-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-gray-500"
             placeholder="Enter a brief description"
           />
-          {errors.description && <p className="text-red-500 text-sm">{errors.description.message}</p>}
+          {errors.description && (
+            <p className="text-red-500 text-sm mt-1">{errors.description.message}</p>
+          )}
         </div>
 
         {/* Course Description */}
-        <div className="mb-4">
-          <label className="block text-sm font-medium text-gray-700">Course Description</label>
+        <div className="mb-6">
+          <label className="block text-lg font-medium text-gray-700 mb-2">
+            Course Description
+          </label>
           <textarea
-            {...register('courseDescription', { required: 'Course description is required' })}
+            {...register("courseDescription", {
+              required: "Course description is required",
+            })}
             rows="4"
-            className="mt-1 block w-full px-4 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+            className="w-full px-4 py-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-gray-500"
             placeholder="Enter detailed course description"
           />
-          {errors.courseDescription && <p className="text-red-500 text-sm">{errors.courseDescription.message}</p>}
+          {errors.courseDescription && (
+            <p className="text-red-500 text-sm mt-1">{errors.courseDescription.message}</p>
+          )}
         </div>
 
         {/* Price */}
-        <div className="mb-4">
-          <label className="block text-sm font-medium text-gray-700">Price</label>
+        <div className="mb-6">
+          <label className="block text-lg font-medium text-gray-700 mb-2">
+            Price
+          </label>
           <input
             type="number"
-            {...register('price', { required: 'Price is required', valueAsNumber: true })}
-            className="mt-1 block w-full px-4 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+            {...register("price", {
+              required: "Price is required",
+              valueAsNumber: true,
+            })}
+            className="w-full px-4 py-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-gray-500"
             placeholder="Enter price"
           />
-          {errors.price && <p className="text-red-500 text-sm">{errors.price.message}</p>}
+          {errors.price && (
+            <p className="text-red-500 text-sm mt-1">{errors.price.message}</p>
+          )}
         </div>
 
         {/* Image URL */}
-        <div className="mb-4">
-          <label className="block text-sm font-medium text-gray-700">Image URL</label>
+        <div className="mb-6">
+          <label className="block text-lg font-medium text-gray-700 mb-2">
+            Image URL
+          </label>
           <input
             type="text"
-            {...register('imageUrl', { required: 'Image URL is required' })}
-            className="mt-1 block w-full px-4 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+            {...register("imageUrl", { required: "Image URL is required" })}
+            className="w-full px-4 py-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-gray-500"
             placeholder="Enter image URL"
           />
-          {errors.imageUrl && <p className="text-red-500 text-sm">{errors.imageUrl.message}</p>}
+          {errors.imageUrl && (
+            <p className="text-red-500 text-sm mt-1">{errors.imageUrl.message}</p>
+          )}
         </div>
 
-        <button
-          type="submit"
-          className="w-full bg-blue-600 text-white py-2 rounded-md hover:bg-blue-700 focus:outline-none"
-          disabled={isSubmitting}
-        >
-          {isSubmitting ? 'Adding Course...' : 'Add Course'}
-        </button>
+        {/* Submit Button */}
+        <div className="flex justify-center">
+          <button
+            type="submit"
+            className="w-full bg-gray-600 text-white py-3 px-4 rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500"
+            disabled={isSubmitting}
+          >
+            {isSubmitting ? "Adding Course..." : "Add Course"}
+          </button>
+        </div>
       </form>
     </div>
   );
