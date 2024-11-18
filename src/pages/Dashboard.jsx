@@ -47,6 +47,7 @@ const Dashboard = () => {
       >
         <h2 className="text-2xl font-bold">Admin Panel</h2>
         <ul className="mt-6">
+          
           <li>
             <Link
               to="/"
@@ -55,14 +56,15 @@ const Dashboard = () => {
               Home
             </Link>
           </li>
-          <li>
+          {/* <li>
             <Link
               to="/all-course"
               className="block py-2 px-4 text-white rounded text-decoration-none"
             >
               Courses
             </Link>
-          </li>
+          </li> */}
+          
           <li>
             <Link
               to="/all-users"
@@ -71,6 +73,15 @@ const Dashboard = () => {
               Users
             </Link>
           </li>
+          <li>
+            <Link
+              to="/user-course"
+              className="block py-2 px-4 text-white rounded text-decoration-none"
+            >
+               Purchased Course
+            </Link>
+          </li>
+          
         </ul>
       </div>
 
@@ -82,9 +93,8 @@ const Dashboard = () => {
           </h1>
         </div> */}
 
-        
         <div>
-          <AllUsers/>
+          <AllUsers />
         </div>
       </div>
     </div>

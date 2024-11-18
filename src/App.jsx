@@ -17,6 +17,7 @@ import { useEffect } from "react";
 import AllUsers from "./pages/AllUsers";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
+import UserCourses from "./pages/UserCourses";
 
 function App() {
   return (
@@ -33,6 +34,7 @@ function App() {
           <Route path="/add-course" element={<AddCourse />} />
           <Route path="/all-course" element={<Courses />} />
           <Route path="/all-users" element={<AllUsers />} />
+          <Route path="/user-course" element={<UserCourses/>} />
         </Routes>
       </AuthProvider>
     </Router>

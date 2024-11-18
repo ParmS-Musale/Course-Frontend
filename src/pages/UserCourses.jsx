@@ -1,59 +1,108 @@
+import React, { useEffect, useState } from "react";
 import axios from "axios";
-import { useEffect, useState } from "react";
 import { toast } from "react-toastify";
+import Navbar from "../components/Navbar";
 
-const UserCourses = () => {
+const PurchasedCourseCard = () => {
   const [courses, setCourses] = useState([]);
   const [loading, setLoading] = useState(true);
 
-  // Function to fetch purchased courses
+  // Fetch the purchased courses from the backend
   const fetchPurchasedCourses = async () => {
-    try {
-      const token = localStorage.getItem("token"); // Assuming you have stored the token in localStorage
+    const token = localStorage.getItem("token");
+    if (!token) {
+      toast.error("Please log in to view your courses.");
+      return;
+    }
 
+    try {
       const response = await axios.get("http://localhost:5020/users/purchase", {
         headers: {
-          Authorization: `Bearer ${token}`, // Add the token to the request headers
+          username: localStorage.getItem("token"),
         },
       });
 
       setCourses(response.data);
     } catch (error) {
-      console.error("Error fetching courses:", error);
-      if (error.response && error.response.data) {
-        toast.error(error.response.data.message);
-      } else {
-        toast.error("Failed to fetch purchased courses.");
-      }
+      console.error("Error fetching purchased courses:", error);
+      toast.error("Failed to fetch purchased courses.");
     } finally {
       setLoading(false);
     }
   };
 
-  // Fetch courses on component mount
+  // Delete the course from the backend and update the state
+  const handleDeleteCourse = async (courseId) => {
+    const token = localStorage.getItem("token");
+    if (!token) {
+      toast.error("Please log in to delete a course.");
+      return;
+    }
+
+    try {
+      // Call the DELETE API to remove the course
+      const response = await axios.delete(`http://localhost:5020/users/purchase/${courseId}`, {
+        headers: {
+          username: localStorage.getItem("token"),
+        },
+      });
+
+      toast.success(response.data); // Show success message
+      // Remove the course from the UI
+      setCourses(courses.filter(course => course.id !== courseId));
+    } catch (error) {
+      console.error("Error deleting course:", error);
+      toast.error("Failed to delete the course.");
+    }
+  };
+
   useEffect(() => {
     fetchPurchasedCourses();
   }, []);
 
   return (
-    <div className="p-4">
-      <h2 className="text-xl font-bold">Your Purchased Courses</h2>
-      {loading ? (
-        <p>Loading...</p>
-      ) : courses.length > 0 ? (
-        <ul>
-          {courses.map((course) => (
-            <li key={course.id} className="my-2">
-              <h3 className="font-semibold">{course.name}</h3>
-              <p>{course.description}</p>
-            </li>
-          ))}
-        </ul>
-      ) : (
-        <p>You have no purchased courses.</p>
-      )}
-    </div>
+    <>
+      <div>
+        <Navbar />
+      </div>
+      <div className="container my-5">
+        <h2 className="text-center mb-4">Your Purchased Courses 📚</h2>
+        {loading ? (
+          <p className="text-center">Loading...</p>
+        ) : courses.length > 0 ? (
+          <div className="row">
+            {courses.map((course) => (
+              <div className="col-12 col-md-6 col-lg-4 mb-4" key={course.id}>
+                <div className="card h-100 shadow-lg rounded">
+                  <img
+                    src={course.imageUrl || "https://via.placeholder.com/150"}
+                    className="card-img-top"
+                    alt={course.title}
+                    style={{ height: "200px", objectFit: "cover" }}
+                  />
+                  <div className="card-body d-flex flex-column">
+                    <h5 className="card-title font-weight-bold">{course.title}</h5>
+                    <p className="card-text text-muted">{course.description}</p>
+                    <div className="mt-auto">
+                      <p className="text-primary font-weight-bold">₹ {course.price}</p>
+                      <button
+                        className="btn btn-danger w-100"
+                        onClick={() => handleDeleteCourse(course.id)} // Delete course when button is clicked
+                      >
+                        Delete Course
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
+        ) : (
+          <p className="text-center">No purchased courses found.</p>
+        )}
+      </div>
+    </>
   );
 };
 
-export default UserCourses;
+export default PurchasedCourseCard;

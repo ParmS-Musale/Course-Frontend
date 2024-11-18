@@ -20,8 +20,8 @@ export const AuthProvider = ({ children }) => {
         Username: email,
         Password: password,
       };
-      const res = await axios.post("http://localhost:5020/user/login",
-        // "http://localhost:5020/admin/auth/login",
+      const res = await axios.post("http://localhost:5020/admin/auth/login",
+        // ,
         payload
       );
       //
