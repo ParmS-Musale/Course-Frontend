@@ -20,8 +20,13 @@ export const AuthProvider = ({ children }) => {
         Username: email,
         Password: password,
       };
-      const res = await axios.post("http://localhost:5020/user/login", payload);
+      const res = await axios.post("http://localhost:5020/user/login",
+        // "http://localhost:5020/admin/auth/login",
+        payload
+      );
+      //
       console.log(res);
+
       if (res.data.username) {
         localStorage.setItem("token", res.data.username);
         setUser(res.data.username);
@@ -29,8 +34,15 @@ export const AuthProvider = ({ children }) => {
         toast.success(res.data.message);
       }
     } catch (error) {
-      console.error(error);
-      toast.alert("Login failed");
+      // Handle error and display the correct error message
+      console.error("Login Error:", error);
+
+      // Check if error has a response and display the message
+      if (error.response && error.response.data.message) {
+        toast.error(error.response.data.message);
+      } else {
+        toast.error("An unexpected error occurred. Please try again.");
+      }
     }
   };
 
@@ -41,19 +53,34 @@ export const AuthProvider = ({ children }) => {
         Username: email,
         Password: password,
       };
+
       const response = await axios.post(
         "http://localhost:5020/user/signup",
         payload
       );
-      console.log(response.data);
-      if (response.data.id) {
-        alert("signup successfull");
-      }
 
-      navigate("/login");
+      // Log the response for debugging
+      console.log(response.data);
+
+      // Check if the signup was successful
+      if (response.data.id) {
+        // Display success message
+        toast.success(response.data.message || "Signup successful!");
+
+        // Redirect to the login page after a short delay
+        setTimeout(() => {
+          navigate("/login");
+        }, 1000);
+      }
     } catch (error) {
-      console.error(error);
-      // alert('Signup failed');
+      console.error("Signup Error:", error);
+
+      // Display error message if available
+      if (error.response && error.response.data.message) {
+        toast.error(error.response.data.message);
+      } else {
+        toast.error("Signup failed. Please try again.");
+      }
     }
   };
 

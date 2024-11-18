@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
-import Navbar from "../components/Navbar";
+import { toast } from "react-toastify";
 
 const AllUsers = () => {
   const [users, setUsers] = useState([]);
@@ -9,7 +9,13 @@ const AllUsers = () => {
   // Fetch all users from the backend
   const fetchUsers = async () => {
     try {
-      const response = await axios.get("http://localhost:5020/admin/users");
+      const response = await axios.get("http://localhost:5020/admin/user", {
+        headers: {
+          username: localStorage.getItem("token"),
+        },
+      });
+      console.log(response);
+
       setUsers(response.data);
     } catch (error) {
       console.error("Error fetching users:", error);
@@ -22,8 +28,12 @@ const AllUsers = () => {
   const deleteUser = async (userId) => {
     try {
       // Send delete request to backend
-      await axios.delete(`http://localhost:5020/admin/user/${userId}`);
-
+      await axios.delete(`http://localhost:5020/admin/user/${userId}`, {
+        headers: {
+          username: localStorage.getItem("token"),
+        },
+      });
+      toast.success("User Deleted Succesfully..!!")
       // Remove the deleted user from the local state
       setUsers((prevUsers) => prevUsers.filter((user) => user.id !== userId));
     } catch (error) {
@@ -37,10 +47,6 @@ const AllUsers = () => {
 
   return (
     <>
-      <div>
-        <Navbar/>
-      </div>
-
       <div className="max-w-5xl mx-auto mt-12 p-6 bg-gray-50 shadow-lg rounded-lg">
         <h1 className="text-3xl font-semibold text-gray-800 mb-8 text-center">
           All Registered Users
